@@ -1,0 +1,149 @@
+<svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg" font-family="ui-sans-serif, system-ui, 'Segoe UI', sans-serif">
+  <!--
+    Next-token prediction as sampling from P(next token | context).
+    Light-theme asset for Quarto revealjs. Recolour via the variables below.
+    Cycle length: 14s, lockstep loop. Built with SMIL (animates in-browser).
+  -->
+
+  <!-- Headings -->
+  <text x="80" y="46" font-size="14" letter-spacing="2.5" fill="#154734" font-weight="600">HOW AN LLM WRITES TEXT</text>
+
+  <!-- Context box -->
+  <rect x="60" y="86" width="840" height="82" rx="10" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="80" y="112" font-size="12" letter-spacing="2" fill="#94A3B8" font-weight="600">CONTEXT</text>
+  <!-- Prompt (fixed) in ink; generated tokens in teal -->
+  <text x="80" y="150" font-size="27" font-family="Georgia, 'Iowan Old Style', serif" fill="#1F2937">The capital of France is</text>
+  <text x="430" y="150" font-size="27" font-family="Georgia, 'Iowan Old Style', serif" fill="#115E67" font-weight="600" opacity="0"> Paris
+    <animate attributeName="opacity" dur="14s" repeatCount="indefinite"
+             keyTimes="0;0.30;0.33;0.93;0.96;1" values="0;0;1;1;0;0"/>
+  </text>
+  <text x="512" y="150" font-size="27" font-family="Georgia, 'Iowan Old Style', serif" fill="#115E67" font-weight="600" opacity="0">.
+    <animate attributeName="opacity" dur="14s" repeatCount="indefinite"
+             keyTimes="0;0.74;0.77;0.93;0.96;1" values="0;0;1;1;0;0"/>
+  </text>
+
+  <!-- Distribution label -->
+  <text x="80" y="218" font-size="18" fill="#1F2937" font-family="Georgia, 'Iowan Old Style', serif" font-style="italic">P( next token | context )</text>
+
+  <!-- Bar lane backdrop (shared by both steps) -->
+  <g fill="#F8FAFC">
+    <rect x="320" y="246" width="460" height="30" rx="4"/>
+    <rect x="320" y="290" width="460" height="30" rx="4"/>
+    <rect x="320" y="334" width="460" height="30" rx="4"/>
+    <rect x="320" y="378" width="460" height="30" rx="4"/>
+    <rect x="320" y="422" width="460" height="30" rx="4"/>
+  </g>
+
+  <!-- ============ STEP 1: peaked distribution (Paris) ============ -->
+  <g opacity="0">
+    <animate attributeName="opacity" dur="14s" repeatCount="indefinite"
+             keyTimes="0;0.04;0.07;0.40;0.43;1" values="0;0;1;1;0;0"/>
+
+    <!-- token labels (mono, right-aligned at x=300) -->
+    <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="17" fill="#334155" text-anchor="end">
+      <text x="300" y="267">"Paris"</text>
+      <text x="300" y="311">"a"</text>
+      <text x="300" y="355">"the"</text>
+      <text x="300" y="399">"located"</text>
+      <text x="300" y="443">"now"</text>
+    </g>
+
+    <!-- bars (width grows .07->.18; Paris bar turns teal when sampled) -->
+    <rect x="320" y="246" height="30" rx="4" fill="#CBD5E1" width="0">
+      <animate attributeName="width" dur="14s" repeatCount="indefinite"
+               keyTimes="0;0.07;0.18;0.41;0.43;1" values="0;0;419;419;0;0"/>
+      <animate attributeName="fill" dur="14s" repeatCount="indefinite"
+               keyTimes="0;0.21;0.25;0.41;0.43;1"
+               values="#CBD5E1;#CBD5E1;#115E67;#115E67;#CBD5E1;#CBD5E1"/>
+    </rect>
+    <rect x="320" y="290" height="30" rx="4" fill="#CBD5E1" width="0">
+      <animate attributeName="width" dur="14s" repeatCount="indefinite"
+               keyTimes="0;0.07;0.18;0.41;0.43;1" values="0;0;14;14;0;0"/>
+    </rect>
+    <rect x="320" y="334" height="30" rx="4" fill="#CBD5E1" width="0">
+      <animate attributeName="width" dur="14s" repeatCount="indefinite"
+               keyTimes="0;0.07;0.18;0.41;0.43;1" values="0;0;9;9;0;0"/>
+    </rect>
+    <rect x="320" y="378" height="30" rx="4" fill="#CBD5E1" width="0">
+      <animate attributeName="width" dur="14s" repeatCount="indefinite"
+               keyTimes="0;0.07;0.18;0.41;0.43;1" values="0;0;9;9;0;0"/>
+    </rect>
+    <rect x="320" y="422" height="30" rx="4" fill="#CBD5E1" width="0">
+      <animate attributeName="width" dur="14s" repeatCount="indefinite"
+               keyTimes="0;0.07;0.18;0.41;0.43;1" values="0;0;9;9;0;0"/>
+    </rect>
+
+    <!-- probabilities (right-aligned at x=804) -->
+    <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="16" fill="#475569" text-anchor="end">
+      <text x="804" y="267">0.91</text>
+      <text x="804" y="311">0.03</text>
+      <text x="804" y="355">0.02</text>
+      <text x="804" y="399">0.02</text>
+      <text x="804" y="443">0.02</text>
+    </g>
+
+    <!-- "sampled" tag -->
+    <text x="820" y="267" font-size="13" font-weight="700" letter-spacing="1.5" fill="#B15533" opacity="0">SAMPLED &#8593;
+      <animate attributeName="opacity" dur="14s" repeatCount="indefinite"
+               keyTimes="0;0.24;0.27;0.41;0.43;1" values="0;0;1;1;0;0"/>
+    </text>
+  </g>
+
+  <!-- ============ STEP 2: flatter distribution (the boring token) ============ -->
+  <g opacity="0">
+    <animate attributeName="opacity" dur="14s" repeatCount="indefinite"
+             keyTimes="0;0.45;0.48;0.88;0.90;1" values="0;0;1;1;0;0"/>
+
+    <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="17" fill="#334155" text-anchor="end">
+      <text x="300" y="267">"."</text>
+      <text x="300" y="311">","</text>
+      <text x="300" y="355">"and"</text>
+      <text x="300" y="399">"&#8212;"</text>
+      <text x="300" y="443">"in"</text>
+    </g>
+
+    <rect x="320" y="246" height="30" rx="4" fill="#CBD5E1" width="0">
+      <animate attributeName="width" dur="14s" repeatCount="indefinite"
+               keyTimes="0;0.50;0.61;0.86;0.88;1" values="0;0;267;267;0;0"/>
+      <animate attributeName="fill" dur="14s" repeatCount="indefinite"
+               keyTimes="0;0.65;0.69;0.86;0.88;1"
+               values="#CBD5E1;#CBD5E1;#115E67;#115E67;#CBD5E1;#CBD5E1"/>
+    </rect>
+    <rect x="320" y="290" height="30" rx="4" fill="#CBD5E1" width="0">
+      <animate attributeName="width" dur="14s" repeatCount="indefinite"
+               keyTimes="0;0.50;0.61;0.86;0.88;1" values="0;0;101;101;0;0"/>
+    </rect>
+    <rect x="320" y="334" height="30" rx="4" fill="#CBD5E1" width="0">
+      <animate attributeName="width" dur="14s" repeatCount="indefinite"
+               keyTimes="0;0.50;0.61;0.86;0.88;1" values="0;0;55;55;0;0"/>
+    </rect>
+    <rect x="320" y="378" height="30" rx="4" fill="#CBD5E1" width="0">
+      <animate attributeName="width" dur="14s" repeatCount="indefinite"
+               keyTimes="0;0.50;0.61;0.86;0.88;1" values="0;0;23;23;0;0"/>
+    </rect>
+    <rect x="320" y="422" height="30" rx="4" fill="#CBD5E1" width="0">
+      <animate attributeName="width" dur="14s" repeatCount="indefinite"
+               keyTimes="0;0.50;0.61;0.86;0.88;1" values="0;0;14;14;0;0"/>
+    </rect>
+
+    <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="16" fill="#475569" text-anchor="end">
+      <text x="804" y="267">0.58</text>
+      <text x="804" y="311">0.22</text>
+      <text x="804" y="355">0.12</text>
+      <text x="804" y="399">0.05</text>
+      <text x="804" y="443">0.03</text>
+    </g>
+
+    <text x="820" y="267" font-size="13" font-weight="700" letter-spacing="1.5" fill="#B15533" opacity="0">SAMPLED &#8593;
+      <animate attributeName="opacity" dur="14s" repeatCount="indefinite"
+               keyTimes="0;0.69;0.72;0.86;0.88;1" values="0;0;1;1;0;0"/>
+    </text>
+
+    <!-- flatter-distribution note -->
+    <text x="320" y="486" font-size="14" fill="#94A3B8" font-style="italic">less peaked &#8594; the model is genuinely less certain here</text>
+  </g>
+
+  <!-- Caption (static) -->
+  <line x1="60" y1="500" x2="900" y2="500" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="60" y="524" font-size="15" fill="#475569">Generation = sample one token from this distribution, append it, then repeat &#8634;</text>
+</svg>

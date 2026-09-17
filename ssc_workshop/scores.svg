@@ -1,0 +1,93 @@
+<svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg" font-family="ui-sans-serif, system-ui, 'Segoe UI', sans-serif">
+  <!-- Forward pass, stage 4: SCORES. final vector -> one logit per vocab token -> softmax -> P(next token). 10s loop, SMIL. -->
+  <defs>
+    <marker id="head" markerWidth="4" markerHeight="4" refX="4" refY="2" orient="auto">
+      <path d="M0,0 L4,2 L0,4 Z" fill="#115E67"/>
+    </marker>
+  </defs>
+
+  <text x="48" y="24" font-size="13" letter-spacing="2.5" fill="#154734" font-weight="700">HOW AN LLM WORKS &#183; SCORES</text>
+
+  <!-- pipeline rail (scores highlighted) -->
+  <g font-size="13" font-weight="600">
+    <rect x="48"  y="40" width="86"  height="28" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+    <text x="91"  y="58" text-anchor="middle" fill="#475569">tokens</text>
+    <rect x="158" y="40" width="118" height="28" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+    <text x="217" y="58" text-anchor="middle" fill="#475569">embeddings</text>
+    <rect x="300" y="40" width="150" height="28" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+    <text x="375" y="58" text-anchor="middle" fill="#475569">attention layers</text>
+    <rect x="474" y="38" width="78"  height="32" rx="6" fill="#D9E9EA" stroke="#115E67" stroke-width="2"/>
+    <text x="513" y="58" text-anchor="middle" fill="#115E67">scores</text>
+    <rect x="576" y="40" width="132" height="28" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+    <text x="642" y="58" text-anchor="middle" fill="#475569">P(next token)</text>
+    <g stroke="#CBD5E1" stroke-width="1.5" fill="none">
+      <path d="M134,54 L156,54" marker-end="url(#head)"/>
+      <path d="M276,54 L298,54" marker-end="url(#head)"/>
+      <path d="M450,54 L472,54" marker-end="url(#head)"/>
+      <path d="M552,54 L574,54" marker-end="url(#head)"/>
+    </g>
+    <rect x="474" y="38" width="78" height="32" rx="6" fill="none" stroke="#115E67" stroke-width="2" opacity="0">
+      <animate attributeName="opacity" dur="10s" repeatCount="indefinite" keyTimes="0;0.5;1" values="0;0.6;0"/>
+      <animate attributeName="stroke-width" dur="10s" repeatCount="indefinite" keyTimes="0;0.5;1" values="2;7;2"/>
+    </rect>
+  </g>
+  <path d="M513,72 L513,90 M507,85 L513,90 L519,85" stroke="#115E67" stroke-width="2" fill="none"/>
+  <text x="48" y="108" font-size="13" font-style="italic" fill="#94A3B8">the final vector &#8594; one score (logit) for every token in the vocabulary</text>
+
+  <text x="48" y="138" font-size="13" font-style="italic" fill="#94A3B8">context: &#8220;The capital of France is&#8221;</text>
+
+  <!-- LEFT: final vector -->
+  <text x="60" y="172" font-size="13" font-weight="600" fill="#475569">final vector</text>
+  <rect x="60" y="182" width="120" height="158" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="15" fill="#334155" text-anchor="middle">
+    <text x="120" y="208">0.31</text>
+    <text x="120" y="234">&#8722;1.20</text>
+    <text x="120" y="260">0.74</text>
+    <text x="120" y="286">0.08</text>
+  </g>
+  <circle cx="120" cy="306" r="1.6" fill="#94A3B8"/><circle cx="120" cy="314" r="1.6" fill="#94A3B8"/><circle cx="120" cy="322" r="1.6" fill="#94A3B8"/>
+
+  <!-- arrow: output projection -->
+  <path d="M186,261 L286,261" stroke="#CBD5E1" stroke-width="1.5" fill="none" marker-end="url(#head)"/>
+  <text x="236" y="250" font-size="12" text-anchor="middle" fill="#94A3B8">&#215; output weights</text>
+
+  <!-- RIGHT: scores list -->
+  <text x="310" y="172" font-size="13" font-weight="600" fill="#475569">a score for every vocabulary token</text>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="16">
+    <!-- Paris (highlighted) -->
+    <g opacity="0"><animate attributeName="opacity" dur="10s" repeatCount="indefinite" keyTimes="0;0.18;0.24;0.92;1" values="0;0;1;1;0"/>
+      <rect x="310" y="184" width="300" height="30" rx="5" fill="#D9E9EA"/>
+      <text x="322" y="205" fill="#115E67" font-weight="700">Paris</text>
+      <text x="598" y="205" text-anchor="end" fill="#115E67" font-weight="700">14.2</text></g>
+    <g fill="#334155">
+      <g opacity="0"><animate attributeName="opacity" dur="10s" repeatCount="indefinite" keyTimes="0;0.24;0.30;0.92;1" values="0;0;1;1;0"/>
+        <text x="322" y="241">Lyon</text><text x="598" y="241" text-anchor="end" fill="#475569">8.0</text></g>
+      <g opacity="0"><animate attributeName="opacity" dur="10s" repeatCount="indefinite" keyTimes="0;0.30;0.36;0.92;1" values="0;0;1;1;0"/>
+        <text x="322" y="271">a</text><text x="598" y="271" text-anchor="end" fill="#475569">7.1</text></g>
+      <g opacity="0"><animate attributeName="opacity" dur="10s" repeatCount="indefinite" keyTimes="0;0.36;0.42;0.92;1" values="0;0;1;1;0"/>
+        <text x="322" y="301">the</text><text x="598" y="301" text-anchor="end" fill="#475569">6.8</text></g>
+      <g opacity="0"><animate attributeName="opacity" dur="10s" repeatCount="indefinite" keyTimes="0;0.42;0.48;0.92;1" values="0;0;1;1;0"/>
+        <text x="322" y="331">located</text><text x="598" y="331" text-anchor="end" fill="#475569">6.5</text></g>
+    </g>
+    <!-- vocabulary ellipsis -->
+    <g opacity="0"><animate attributeName="opacity" dur="10s" repeatCount="indefinite" keyTimes="0;0.48;0.54;0.92;1" values="0;0;1;1;0"/>
+      <circle cx="322" cy="350" r="1.6" fill="#94A3B8"/><circle cx="322" cy="358" r="1.6" fill="#94A3B8"/><circle cx="322" cy="366" r="1.6" fill="#94A3B8"/>
+      <text x="340" y="364" font-size="13" font-style="italic" fill="#94A3B8">~50,000 tokens in the vocabulary</text>
+      <text x="322" y="394" fill="#94A3B8">pizza</text><text x="598" y="394" text-anchor="end" fill="#94A3B8">&#8722;2.1</text>
+    </g>
+  </g>
+
+  <!-- softmax bridge to P(next token) -->
+  <g opacity="0"><animate attributeName="opacity" dur="10s" repeatCount="indefinite" keyTimes="0;0.60;0.68;0.92;1" values="0;0;1;1;0"/>
+    <path d="M624,289 L688,289" stroke="#115E67" stroke-width="2" fill="none" marker-end="url(#head)"/>
+    <text x="656" y="278" font-size="13" text-anchor="middle" fill="#115E67" font-weight="600">softmax</text>
+    <rect x="700" y="266" width="196" height="46" rx="8" fill="#FBEEE8" stroke="#E3C2B4"/>
+    <text x="798" y="285" font-size="12" text-anchor="middle" fill="#94A3B8">P(next token)</text>
+    <text x="798" y="303" font-size="15" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" fill="#B15533" font-weight="700">Paris  0.91</text>
+  </g>
+
+  <!-- caption -->
+  <line x1="48" y1="450" x2="912" y2="450" stroke="#E2E8F0"/>
+  <text x="48" y="476" font-size="15" fill="#475569">One raw score per vocabulary token (scores can be negative &#8212; they aren&#8217;t probabilities yet).</text>
+  <text x="48" y="500" font-size="13" font-style="italic" fill="#94A3B8">Softmax turns the whole list of scores into the probability distribution you sample from.</text>
+</svg>

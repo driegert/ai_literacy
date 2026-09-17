@@ -1,0 +1,98 @@
+<svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg" font-family="ui-sans-serif, system-ui, 'Segoe UI', sans-serif">
+  <!-- Forward pass, stage 1: TOKENS. Raw text -> tokens (often sub-words) -> integer IDs. 11s loop, SMIL. -->
+  <defs>
+    <marker id="head" markerWidth="4" markerHeight="4" refX="4" refY="2" orient="auto">
+      <path d="M0,0 L4,2 L0,4 Z" fill="#115E67"/>
+    </marker>
+  </defs>
+
+  <text x="48" y="24" font-size="13" letter-spacing="2.5" fill="#154734" font-weight="700">HOW AN LLM WORKS &#183; TOKENS</text>
+
+  <!-- pipeline rail (tokens highlighted) -->
+  <g font-size="13" font-weight="600">
+    <rect x="48"  y="38" width="86"  height="32" rx="6" fill="#D9E9EA" stroke="#115E67" stroke-width="2"/>
+    <text x="91"  y="58" text-anchor="middle" fill="#115E67">tokens</text>
+    <rect x="158" y="40" width="118" height="28" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+    <text x="217" y="58" text-anchor="middle" fill="#475569">embeddings</text>
+    <rect x="300" y="40" width="150" height="28" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+    <text x="375" y="58" text-anchor="middle" fill="#475569">attention layers</text>
+    <rect x="474" y="40" width="78"  height="28" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+    <text x="513" y="58" text-anchor="middle" fill="#475569">scores</text>
+    <rect x="576" y="40" width="132" height="28" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+    <text x="642" y="58" text-anchor="middle" fill="#475569">P(next token)</text>
+    <g stroke="#CBD5E1" stroke-width="1.5" fill="none">
+      <path d="M134,54 L156,54" marker-end="url(#head)"/>
+      <path d="M276,54 L298,54" marker-end="url(#head)"/>
+      <path d="M450,54 L472,54" marker-end="url(#head)"/>
+      <path d="M552,54 L574,54" marker-end="url(#head)"/>
+    </g>
+    <rect x="48" y="38" width="86" height="32" rx="6" fill="none" stroke="#115E67" stroke-width="2" opacity="0">
+      <animate attributeName="opacity" dur="11s" repeatCount="indefinite" keyTimes="0;0.5;1" values="0;0.6;0"/>
+      <animate attributeName="stroke-width" dur="11s" repeatCount="indefinite" keyTimes="0;0.5;1" values="2;7;2"/>
+    </rect>
+  </g>
+  <path d="M91,72 L91,90 M85,85 L91,90 L97,85" stroke="#115E67" stroke-width="2" fill="none"/>
+  <text x="48" y="108" font-size="13" font-style="italic" fill="#94A3B8">raw text &#8594; a sequence of tokens (often sub-words) &#8594; integer IDs</text>
+
+  <!-- raw text -->
+  <rect x="60" y="128" width="840" height="62" rx="10" fill="#F1F5F9" stroke="#E2E8F0"/>
+  <text x="78" y="150" font-size="12" letter-spacing="2" fill="#94A3B8" font-weight="600">RAW TEXT</text>
+  <text x="78" y="178" font-size="24" font-family="Georgia, 'Iowan Old Style', serif" fill="#1F2937">&#8220;Tokenization is just chopping text up.&#8221;</text>
+
+  <!-- sub-word brace over Token + ization -->
+  <g opacity="0">
+    <animate attributeName="opacity" dur="11s" repeatCount="indefinite" keyTimes="0;0.40;0.45;0.90;1" values="0;0;1;1;0"/>
+    <path d="M60,244 L60,238 L214,238 L214,244 M137,238 L137,232" stroke="#115E67" stroke-width="1.5" fill="none"/>
+    <text x="137" y="226" font-size="13" text-anchor="middle" fill="#115E67" font-weight="600">one word &#8594; two tokens</text>
+  </g>
+
+  <!-- token chips (chip + token + integer id), staggered like progressive chopping -->
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="16">
+    <!-- Token (sub-word) -->
+    <g opacity="0"><animate attributeName="opacity" dur="11s" repeatCount="indefinite" keyTimes="0;0.12;0.17;0.90;1" values="0;0;1;1;0"/>
+      <rect x="60" y="252" width="63" height="40" rx="6" fill="#D9E9EA" stroke="#115E67"/>
+      <text x="91" y="278" text-anchor="middle" fill="#115E67" font-weight="700">Token</text>
+      <text x="91" y="314" text-anchor="middle" font-size="14" fill="#94A3B8">30642</text></g>
+    <!-- ization (sub-word) -->
+    <g opacity="0"><animate attributeName="opacity" dur="11s" repeatCount="indefinite" keyTimes="0;0.15;0.20;0.90;1" values="0;0;1;1;0"/>
+      <rect x="133" y="252" width="81" height="40" rx="6" fill="#D9E9EA" stroke="#115E67"/>
+      <text x="173" y="278" text-anchor="middle" fill="#115E67" font-weight="700">ization</text>
+      <text x="173" y="314" text-anchor="middle" font-size="14" fill="#94A3B8">1634</text></g>
+    <!-- is -->
+    <g opacity="0"><animate attributeName="opacity" dur="11s" repeatCount="indefinite" keyTimes="0;0.18;0.23;0.90;1" values="0;0;1;1;0"/>
+      <rect x="224" y="252" width="36" height="40" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <text x="242" y="278" text-anchor="middle" fill="#334155">is</text>
+      <text x="242" y="314" text-anchor="middle" font-size="14" fill="#94A3B8">318</text></g>
+    <!-- just -->
+    <g opacity="0"><animate attributeName="opacity" dur="11s" repeatCount="indefinite" keyTimes="0;0.21;0.26;0.90;1" values="0;0;1;1;0"/>
+      <rect x="270" y="252" width="54" height="40" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <text x="297" y="278" text-anchor="middle" fill="#334155">just</text>
+      <text x="297" y="314" text-anchor="middle" font-size="14" fill="#94A3B8">655</text></g>
+    <!-- chopping -->
+    <g opacity="0"><animate attributeName="opacity" dur="11s" repeatCount="indefinite" keyTimes="0;0.24;0.29;0.90;1" values="0;0;1;1;0"/>
+      <rect x="334" y="252" width="90" height="40" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <text x="379" y="278" text-anchor="middle" fill="#334155">chopping</text>
+      <text x="379" y="314" text-anchor="middle" font-size="14" fill="#94A3B8">49592</text></g>
+    <!-- text -->
+    <g opacity="0"><animate attributeName="opacity" dur="11s" repeatCount="indefinite" keyTimes="0;0.27;0.32;0.90;1" values="0;0;1;1;0"/>
+      <rect x="434" y="252" width="54" height="40" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <text x="461" y="278" text-anchor="middle" fill="#334155">text</text>
+      <text x="461" y="314" text-anchor="middle" font-size="14" fill="#94A3B8">2420</text></g>
+    <!-- up -->
+    <g opacity="0"><animate attributeName="opacity" dur="11s" repeatCount="indefinite" keyTimes="0;0.30;0.35;0.90;1" values="0;0;1;1;0"/>
+      <rect x="498" y="252" width="36" height="40" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <text x="516" y="278" text-anchor="middle" fill="#334155">up</text>
+      <text x="516" y="314" text-anchor="middle" font-size="14" fill="#94A3B8">510</text></g>
+    <!-- . -->
+    <g opacity="0"><animate attributeName="opacity" dur="11s" repeatCount="indefinite" keyTimes="0;0.33;0.38;0.90;1" values="0;0;1;1;0"/>
+      <rect x="544" y="252" width="27" height="40" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <text x="557" y="278" text-anchor="middle" fill="#334155">.</text>
+      <text x="557" y="314" text-anchor="middle" font-size="14" fill="#94A3B8">13</text></g>
+  </g>
+  <text x="600" y="318" font-size="13" font-style="italic" fill="#CBD5E1">&#8593; token IDs</text>
+
+  <!-- caption -->
+  <line x1="48" y1="430" x2="912" y2="430" stroke="#E2E8F0"/>
+  <text x="48" y="456" font-size="15" fill="#475569">The model never sees letters &#8212; only this sequence of integer IDs.</text>
+  <text x="48" y="480" font-size="13" font-style="italic" fill="#94A3B8">Sub-words, spaces, and capitalization are all part of how text gets tokenized.</text>
+</svg>

@@ -1,0 +1,171 @@
+/* obsolete according to: https://stackoverflow.com/questions/5639827/styling-mathjax/25329062#25329062
+.MathJax {
+ font-size: 0.8em;
+}
+
+add
+
+<script type="text/x-mathjax-config"> 
+    MathJax.Hub.Config({ 
+        "HTML-CSS": { scale: 200, linebreaks: { automatic: true } }, 
+        SVG: { linebreaks: { automatic:true } }, 
+        displayAlign: "left" });
+</script>
+
+at the beginning of .qmd files
+*/
+
+.boxed-eq {
+  border: 3px solid #115E67;
+  padding: 10px;
+  display: block;
+  width: fit-content;
+  margin: 10px auto;
+  text-align: center;
+}
+
+.reveal div.cell-annotation {
+  font-size: 0.7em;
+  color: grey; /*#D58B70*/ /*B15533*/ /*A9C47F*/
+}
+/* SOMETHING like this? */
+/*
+.reveal div.quarto-figure {
+  margin-bottom: 2px;
+}
+*/
+
+.reveal section p {
+  font-size: 0.8em;
+  line-height: 1.2em;
+  vertical-align: top;
+  /*margin-top: -0.25em;*/
+}
+
+.reveal section li {
+  font-size: 0.8em;
+  line-height: 1.1em;
+  margin-top: -0.25em;
+  margin-bottom: -0.25em;
+}
+
+.reveal section ol {
+  font-size: 1em;
+  line-height: 1em;
+  margin-top: -0.25em;
+  margin-bottom: -0.25em;
+}
+
+.reveal section h1 {
+  font-size: 1.5em;
+  /* color: #B15533; */ /* burnt orange */
+  color: #154734;
+}
+
+.reveal section h2 {
+  font-size: 1.3em;
+  line-height: 1.3em;
+  margin-bottom: -0.1em;
+  color: #154734;
+}
+
+.reveal section h3 {
+  font-size: 0.9em;
+  line-height: 1.3em;
+  margin-bottom: 0.3em;
+  color: #154734;
+}
+
+strong {
+  font-weight: bold;
+  color: #115E67;
+}
+
+em {
+  font-style: italic;
+  color: #11671a;
+}
+
+.reveal section blockquote{
+  font-size: 1em;
+  line-height: 1.1em;
+}
+
+/* Changes the background color of the title slide. */
+.slide-background:first-child {
+  background-color: #FFFFFF;
+}
+
+.r-code {
+  position: absolute;
+  bottom: 20px;
+  left: 30px;
+  width: 172px;
+  height: 29px;
+  z-index: 1000;
+  background-image: url('fig/icons/r-code.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.8;
+}
+
+.ai-icon {
+  position: absolute;
+  bottom: 20px;
+  left: 30px;
+  width: 40px;
+  height: 40px;
+  z-index: 1000;
+  background-image: url('fig/icons/ai.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.8;
+}
+
+.big-idea {
+  position: absolute;
+  bottom: 20px;
+  left: 30px;
+  width: 80px;
+  height: 80px;
+  z-index: 1000;
+  background-image: url('fig/icons/lightbulb.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.8;
+}
+
+.not-tested {
+  position: absolute;
+  bottom: 20px;
+  left: 30px;
+  width: 60px;
+  height: 60px;
+  z-index: 1000;
+  background-image: url('fig/icons/not_tested.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.8;
+}
+
+.blackboard {
+  position: absolute;
+  bottom: 20px;
+  left: 30px;
+  width: 189px;
+  height: 26px;
+  z-index: 1000;
+  background-image: url('fig/icons/blackboard-logo-colored.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.8;
+}
+
+.vspace {
+  height: 100px; /* Default height */
+}

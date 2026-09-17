@@ -1,0 +1,206 @@
+<svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg" font-family="ui-sans-serif, system-ui, 'Segoe UI', sans-serif">
+  <!--
+    Inside one forward pass: zooming into self-attention.
+    Example: "I poured water from the bottle into the cup until it was full / empty."
+    full  -> "it" = the cup ;  empty -> "it" = the bottle.
+    Light-theme asset for Quarto revealjs. 12s lockstep loop. SMIL (animates in-browser).
+    Recolour: teal #115E67 = active/strong, slate #CBD5E1 = inactive, orange #B15533 = resolution.
+  -->
+  <defs>
+    <marker id="head" markerWidth="4" markerHeight="4" refX="4" refY="2" orient="auto">
+      <path d="M0,0 L4,2 L0,4 Z" fill="#115E67"/>
+    </marker>
+  </defs>
+
+  <!-- kicker -->
+  <text x="48" y="24" font-size="13" letter-spacing="2.5" fill="#154734" font-weight="700">HOW AN LLM WORKS &#183; ZOOMING INTO ATTENTION</text>
+
+  <!-- ===== forward-pass rail (anatomy) ===== -->
+  <g font-size="13" font-weight="600">
+    <!-- chips -->
+    <g>
+      <rect x="48"  y="40" width="86"  height="28" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+      <text x="91"  y="58" text-anchor="middle" fill="#475569">tokens</text>
+      <rect x="158" y="40" width="118" height="28" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+      <text x="217" y="58" text-anchor="middle" fill="#475569">embeddings</text>
+      <rect x="300" y="38" width="150" height="32" rx="7" fill="#D9E9EA" stroke="#115E67" stroke-width="2"/>
+      <text x="375" y="58" text-anchor="middle" fill="#115E67">attention layers</text>
+      <rect x="474" y="40" width="78"  height="28" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+      <text x="513" y="58" text-anchor="middle" fill="#475569">scores</text>
+      <rect x="576" y="40" width="132" height="28" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+      <text x="642" y="58" text-anchor="middle" fill="#475569">P(next token)</text>
+    </g>
+    <!-- connectors -->
+    <g stroke="#CBD5E1" stroke-width="1.5" fill="none">
+      <path d="M134,54 L156,54" marker-end="url(#head)"/>
+      <path d="M276,54 L298,54" marker-end="url(#head)"/>
+      <path d="M450,54 L472,54" marker-end="url(#head)"/>
+      <path d="M552,54 L574,54" marker-end="url(#head)"/>
+    </g>
+    <!-- pulse on the attention chip -->
+    <rect x="300" y="38" width="150" height="32" rx="7" fill="none" stroke="#115E67" stroke-width="2" opacity="0">
+      <animate attributeName="opacity" dur="12s" repeatCount="indefinite"
+               keyTimes="0;0.5;1" values="0;0.6;0" calcMode="linear"/>
+      <animate attributeName="stroke-width" dur="12s" repeatCount="indefinite"
+               keyTimes="0;0.5;1" values="2;7;2" calcMode="linear"/>
+    </rect>
+  </g>
+  <!-- zoom pointer + AIAYN tag -->
+  <path d="M375,72 L375,94 M368,87 L375,94 L382,87" stroke="#115E67" stroke-width="2" fill="none"/>
+  <text x="48" y="90" font-size="12" fill="#94A3B8" font-style="italic">self-attention &#8212; the 2017 idea everyone cites: &#8220;Attention Is All You Need&#8221;</text>
+
+  <!-- divider between the two panels -->
+  <line x1="636" y1="110" x2="636" y2="470" stroke="#E2E8F0" stroke-width="1"/>
+
+  <!-- panel labels -->
+  <text x="48"  y="124" font-size="12" letter-spacing="1.5" fill="#94A3B8" font-weight="700">WHAT THE MODEL HAS</text>
+  <text x="664" y="124" font-size="12" letter-spacing="1.5" fill="#94A3B8" font-weight="700">WHAT YOU PICTURE</text>
+
+  <!-- ===== attention arrows are drawn near the end (top layer), approaching from below ===== -->
+
+  <!-- ===== sentence: line 1 ===== -->
+  <!-- referent highlights (behind chips) -->
+  <rect x="528" y="130" width="43" height="36" rx="6" fill="#D9E9EA" opacity="1">
+    <animate attributeName="opacity" dur="12s" repeatCount="indefinite"
+             keyTimes="0;0.45;0.50;0.95;1" values="1;1;0;0;1"/>
+  </rect>
+  <rect x="339" y="130" width="70" height="36" rx="6" fill="#D9E9EA" opacity="0">
+    <animate attributeName="opacity" dur="12s" repeatCount="indefinite"
+             keyTimes="0;0.45;0.50;0.95;1" values="0;0;1;1;0"/>
+  </rect>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="16">
+    <!-- chip = rounded rect + text; nouns get a coloured border -->
+    <g fill="#F8FAFC" stroke="#E2E8F0">
+      <rect x="48"  y="130" width="25" height="36" rx="6"/>
+      <rect x="81"  y="130" width="70" height="36" rx="6"/>
+      <rect x="159" y="130" width="61" height="36" rx="6"/>
+      <rect x="228" y="130" width="52" height="36" rx="6"/>
+      <rect x="288" y="130" width="43" height="36" rx="6"/>
+      <rect x="417" y="130" width="52" height="36" rx="6"/>
+      <rect x="477" y="130" width="43" height="36" rx="6"/>
+    </g>
+    <rect x="339" y="130" width="70" height="36" rx="6" fill="none" stroke="#115E67" stroke-width="1.5"/>
+    <rect x="528" y="130" width="43" height="36" rx="6" fill="none" stroke="#115E67" stroke-width="1.5"/>
+    <g fill="#334155" text-anchor="middle">
+      <text x="60"  y="154">I</text>
+      <text x="116" y="154">poured</text>
+      <text x="189" y="154">water</text>
+      <text x="254" y="154">from</text>
+      <text x="309" y="154">the</text>
+      <text x="374" y="154" fill="#115E67" font-weight="700">bottle</text>
+      <text x="443" y="154">into</text>
+      <text x="498" y="154">the</text>
+      <text x="549" y="154" fill="#115E67" font-weight="700">cup</text>
+    </g>
+  </g>
+
+  <!-- ===== sentence: line 2 ===== -->
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="16">
+    <g fill="#F8FAFC" stroke="#E2E8F0">
+      <rect x="48"  y="192" width="61" height="36" rx="6"/>
+      <rect x="159" y="192" width="43" height="36" rx="6"/>
+    </g>
+    <!-- "it" = the query token -->
+    <rect x="117" y="192" width="34" height="36" rx="6" fill="#F5E0D7" stroke="#B15533" stroke-width="1.5"/>
+    <!-- adjective slot -->
+    <rect x="210" y="192" width="61" height="36" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <g text-anchor="middle" fill="#334155">
+      <text x="78"  y="216">until</text>
+      <text x="134" y="216" fill="#B15533" font-weight="700">it</text>
+      <text x="180" y="216">was</text>
+    </g>
+    <!-- adjective cross-fade -->
+    <text x="240" y="216" text-anchor="middle" fill="#1F2937" font-weight="700" opacity="1">full
+      <animate attributeName="opacity" dur="12s" repeatCount="indefinite"
+               keyTimes="0;0.45;0.50;0.95;1" values="1;1;0;0;1"/>
+    </text>
+    <text x="240" y="216" text-anchor="middle" fill="#1F2937" font-weight="700" opacity="0">empty
+      <animate attributeName="opacity" dur="12s" repeatCount="indefinite"
+               keyTimes="0;0.45;0.50;0.95;1" values="0;0;1;1;0"/>
+    </text>
+  </g>
+
+  <!-- resolution pill -->
+  <g>
+    <rect x="48" y="252" width="220" height="34" rx="17" fill="#FBEEE8" stroke="#E3C2B4"/>
+    <text x="64" y="274" font-size="15" fill="#B15533" opacity="1">&#8594; &#8220;it&#8221; resolves to the cup
+      <animate attributeName="opacity" dur="12s" repeatCount="indefinite"
+               keyTimes="0;0.45;0.50;0.95;1" values="1;1;0;0;1"/>
+    </text>
+    <text x="64" y="274" font-size="15" fill="#B15533" opacity="0">&#8594; &#8220;it&#8221; resolves to the bottle
+      <animate attributeName="opacity" dur="12s" repeatCount="indefinite"
+               keyTimes="0;0.45;0.50;0.95;1" values="0;0;1;1;0"/>
+    </text>
+  </g>
+
+  <!-- attention takeaway -->
+  <text x="48" y="330" font-size="14" fill="#475569">The same word &#8220;it&#8221; points to a different token</text>
+  <text x="48" y="350" font-size="14" fill="#475569">depending on what it attends to in context.</text>
+  <text x="48" y="382" font-size="13" fill="#94A3B8" font-style="italic">Attention = a learned, context-dependent weighting</text>
+  <text x="48" y="400" font-size="13" fill="#94A3B8" font-style="italic">over the other tokens. No symbolic reasoning inside.</text>
+
+  <!-- ===== scene: bottle + cup ===== -->
+  <!-- bottle -->
+  <rect x="712" y="186" width="20" height="26" rx="3" fill="#E2E8F0"/>
+  <rect x="690" y="208" width="64" height="184" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <!-- bottle water (drains during 'empty') -->
+  <rect x="694" y="240" width="56" height="148" rx="8" fill="#7DD3FC">
+    <animate attributeName="height" dur="12s" repeatCount="indefinite"
+             keyTimes="0;0.50;0.55;0.90;0.96;1" values="148;148;148;6;6;148"/>
+    <animate attributeName="y" dur="12s" repeatCount="indefinite"
+             keyTimes="0;0.50;0.55;0.90;0.96;1" values="240;240;240;382;382;240"/>
+  </rect>
+  <!-- bottle highlight (on during 'empty') -->
+  <rect x="686" y="204" width="72" height="192" rx="14" fill="none" stroke="#115E67" stroke-width="3" opacity="0">
+    <animate attributeName="opacity" dur="12s" repeatCount="indefinite"
+             keyTimes="0;0.45;0.50;0.95;1" values="0;0;1;1;0"/>
+  </rect>
+  <text x="722" y="412" font-size="14" text-anchor="middle" fill="#475569">bottle</text>
+  <text x="722" y="178" font-size="13" font-weight="700" text-anchor="middle" fill="#115E67" opacity="0">EMPTY
+    <animate attributeName="opacity" dur="12s" repeatCount="indefinite"
+             keyTimes="0;0.45;0.50;0.95;1" values="0;0;1;1;0"/>
+  </text>
+
+  <!-- cup -->
+  <rect x="820" y="298" width="86" height="94" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <!-- cup water (rises during the 'cup' phase, recedes for the loop) -->
+  <clipPath id="cupclip2"><rect x="822" y="310" width="82" height="80" rx="6"/></clipPath>
+  <g clip-path="url(#cupclip2)">
+    <rect x="824" y="388" width="78" height="0" fill="#7DD3FC">
+      <animate attributeName="height" dur="12s" repeatCount="indefinite"
+               keyTimes="0;0.05;0.22;0.90;1" values="0;0;76;76;0"/>
+      <animate attributeName="y" dur="12s" repeatCount="indefinite"
+               keyTimes="0;0.05;0.22;0.90;1" values="388;388;312;312;388"/>
+    </rect>
+  </g>
+  <!-- cup highlight (on during 'full') -->
+  <rect x="816" y="294" width="94" height="102" rx="12" fill="none" stroke="#115E67" stroke-width="3" opacity="1">
+    <animate attributeName="opacity" dur="12s" repeatCount="indefinite"
+             keyTimes="0;0.45;0.50;0.95;1" values="1;1;0;0;1"/>
+  </rect>
+  <text x="863" y="412" font-size="14" text-anchor="middle" fill="#475569">cup</text>
+  <text x="863" y="288" font-size="13" font-weight="700" text-anchor="middle" fill="#115E67" opacity="1">FULL
+    <animate attributeName="opacity" dur="12s" repeatCount="indefinite"
+             keyTimes="0;0.45;0.50;0.95;1" values="1;1;0;0;1"/>
+  </text>
+
+  <!-- honesty caption -->
+  <line x1="48" y1="486" x2="912" y2="486" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="48" y="510" font-size="14" fill="#475569">The model only has the tokens and learned attention weights (left). It lands the same answer as your mental</text>
+  <text x="48" y="528" font-size="14" fill="#475569">picture (right) &#8212; from patterns in text, not by imagining the scene.</text>
+  <!-- ===== attention arrows: top layer, rising from 'it' to the bottom border of each noun ===== -->
+  <!-- it -> bottle -->
+  <path d="M134,190 C 200,178 372,180 372,167" fill="none" stroke="#115E67" stroke-width="1.5" opacity="0.28" marker-end="url(#head)">
+    <animate attributeName="stroke-width" dur="12s" repeatCount="indefinite"
+             keyTimes="0;0.45;0.50;0.95;1" values="1.5;1.5;5;5;1.5"/>
+    <animate attributeName="opacity" dur="12s" repeatCount="indefinite"
+             keyTimes="0;0.45;0.50;0.95;1" values="0.28;0.28;1;1;0.28"/>
+  </path>
+  <!-- it -> cup -->
+  <path d="M134,190 C 200,178 549,180 549,167" fill="none" stroke="#115E67" stroke-width="5" opacity="1" marker-end="url(#head)">
+    <animate attributeName="stroke-width" dur="12s" repeatCount="indefinite"
+             keyTimes="0;0.45;0.50;0.95;1" values="5;5;1.5;1.5;5"/>
+    <animate attributeName="opacity" dur="12s" repeatCount="indefinite"
+             keyTimes="0;0.45;0.50;0.95;1" values="1;1;0.28;0.28;1"/>
+  </path>
+</svg>

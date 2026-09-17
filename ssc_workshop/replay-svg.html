@@ -1,0 +1,89 @@
+<style>
+  /* Full-bleed animated SVG figures (driven by the script below). */
+  /* Size the figure to the (transform-scaled) slide box, not the viewport:
+     vh units inside a CSS-transformed revealjs slide don't track the box, so
+     88vh left whitespace above the image. width:100% + aspect-ratio keeps the
+     16:9 SVG intact, and flex centering removes the offset. */
+  .reveal section.svgslide {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .reveal section.svgslide > div { height: 100%; }
+  .reveal .figsvg {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    max-height: 100%;
+    margin: 0 auto;
+    border: none;
+    background: #ffffff;
+    pointer-events: none;   /* don't let the embedded SVG grab focus / swallow arrow keys */
+  }
+</style>
+
+<script>
+  // Replay-on-entry for the animated SVG figures.
+  // Each <object class="figsvg"> loops twice when its slide becomes current,
+  // then freezes on its "finished" frame. Off-slide figures stay paused so
+  // nothing runs off-screen. SVG files are unchanged: if this script never
+  // runs, they simply loop as authored.
+  (function () {
+    function svgOf(obj) {
+      try { return obj.contentDocument && obj.contentDocument.querySelector('svg'); }
+      catch (e) { return null; }           // cross-origin (e.g. self-contained build)
+    }
+    function dur(obj)  { return parseFloat(obj.dataset.dur)  || 11; }   // seconds, one cycle
+    function loops(obj){ return parseInt(obj.dataset.loops)  || 2; }
+    function hold(obj) { return obj.dataset.hold != null ? parseFloat(obj.dataset.hold) : 0.9; }
+
+    function whenReady(obj, fn) {
+      var svg = svgOf(obj);
+      if (svg && svg.setCurrentTime) fn(svg);
+      else obj.addEventListener('load', function () {
+        var s = svgOf(obj); if (s && s.setCurrentTime) fn(s);
+      }, { once: true });
+    }
+
+    function freezeStart(obj) {            // park a not-current figure at frame 0, paused
+      whenReady(obj, function (svg) {
+        if (obj._t) { clearTimeout(obj._t); obj._t = null; }
+        svg.pauseAnimations();
+        svg.setCurrentTime(0);
+      });
+    }
+
+    function play(obj) {                   // reset -> run loops -> freeze on finished frame
+      whenReady(obj, function (svg) {
+        if (obj._t) { clearTimeout(obj._t); obj._t = null; }
+        svg.setCurrentTime(0);
+        svg.unpauseAnimations();
+        var ms = loops(obj) * dur(obj) * 1000 + 80;
+        obj._t = setTimeout(function () {
+          svg.pauseAnimations();
+          svg.setCurrentTime(hold(obj) * dur(obj));
+        }, ms);
+      });
+    }
+
+    function figs(scope) {
+      return Array.prototype.slice.call(
+        (scope || document).querySelectorAll('object.figsvg'));
+    }
+
+    function start() {
+      if (!window.Reveal || !Reveal.on) { setTimeout(start, 100); return; }
+      figs(document).forEach(freezeStart);            // park everything
+      Reveal.on('slidechanged', function (ev) {
+        if (ev.previousSlide) figs(ev.previousSlide).forEach(freezeStart);
+        figs(ev.currentSlide).forEach(play);
+      });
+      var cur = Reveal.getCurrentSlide && Reveal.getCurrentSlide();
+      if (cur) figs(cur).forEach(play);               // the slide we land on at load
+    }
+    start();
+  })();
+</script>

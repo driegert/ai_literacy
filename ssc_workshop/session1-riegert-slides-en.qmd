@@ -1,0 +1,578 @@
+---
+title: "SSC 2026 --- AI and LLMs"
+subtitle: "What is an LLM? Foundations for the Day"
+author: "Aurélien Nicosia & David Riegert"
+date: "2026-05-31"
+date-format: long
+engine: knitr
+execute:
+  echo: true
+format:
+  revealjs:
+    theme: default
+    margin: 0.05
+    incremental: false
+    logo: TUPMS.png
+    css: style.css
+    include-after-body: replay-svg.html
+    pdf-separate-fragments: false
+slide-number: true
+smaller: false
+---
+
+# Welcome
+
+```{r}
+#| label: packages
+#| include: false
+
+library(tidyverse)
+library(tidyr)
+library(knitr)
+library(kableExtra)
+
+options(knitr.table.format = "html")  # honour escape = FALSE so <strong>/<em> in cells render
+theme_set(theme_bw())
+```
+
+## Welcome --- SSC 2026 AI Workshop {style="font-size:95%;"}
+
+**One day, four presenters, two halves.**
+
+- **Morning** a shared foundation for *everyone*, research and education alike.
+- **Afternoon** splits into **Research** (DSA) and **Education** (Stat Edu) tracks.
+
+This first session is the foundation the whole day stands on. No assumptions about prior experience --- we're starting from "what is this thing, really?"
+
+::: {.notes}
+~5 min total for welcome + frame. Warm, low-key. Acknowledge the mixed room: some people use these tools daily, some are skeptics, some have never opened one. The goal is a shared vocabulary by 10:15. Questions welcome, but we keep moving --- there's a buffer built in.
+:::
+
+## Where We're Going
+
+By **16:30**, everyone walks out with:
+
+- **(a) Foundations** — What LLMs are, how to use them, and the *3D ladder* (this session)
+- **(b) Audit literacy** — A practiced habit of *checking* AI output, not trusting fluency
+- **(c) 3D fluency** — Knowing how to start thinking about what to hand off and at what level of autonomy.
+- **(d) Exposure to Agent Tools** -- Working with a model and a harness (an agent).
+
+## Today's Schedule
+
+```{r}
+#| echo: false
+
+tibble(
+  Session = c("1", "-", "2", "-", "3", "-", "4"),
+  Time = c("09:00–10:15", "10:15–10:30", "10:45–12:00",
+           "12:00–13:30", "13:30–15:00", "15:00–15:15", "15:15–16:30"),
+  What = c("<strong>Foundations</strong> <em>(you are here)</em>", "Coffee",
+           "<strong>Audit literacy</strong>", "Lunch", "<strong>Applied 3D</strong> <em>(tracks split)</em>",
+           "Coffee", "<strong>Take-home workflow</strong> <em>(tracks split)</em>")
+) |>
+  kable(escape = FALSE) |>
+  kable_styling(font_size = 28, full_width = FALSE) |>
+  column_spec(1, bold = TRUE)
+```
+
+## This session --- You'll Leave Able To... {style="font-size:90%;"}
+
+- **Describe what an LLM is actually doing** --- next-token prediction, training, and "modes"
+    - e.g., why _is_ attention all you need?
+- **Understand when you would use different "surfaces"** --- chat, IDE, API, local
+    - trade-offs in cost, privacy, and friction
+
+::: {.notes}
+This is the contract for the next 50 minutes. We'll demystify the machine, peek at the architecture, tour where you meet it, see some prompting, look at what I personally run at home, and end with the framework that organizes the whole day. Lots of live demos --- including some R you'll recognize.
+:::
+
+# What an LLM Actually Does
+
+## The Whole Trick: Predict the Next Token {style="font-size:95%;"}
+
+> An LLM is a function that, given the text so far, outputs a **probability distribution over what comes next** --- then samples from it. Repeat.
+
+. . .
+
+That's it. Everything else --- "reasoning," "writing code," "knowing facts" --- is this loop running over and over.
+
+. . .
+
+This is a *conditional distribution*.
+
+$$
+P(\text{next token} \mid \text{all previous tokens})
+$$
+
+and as a result we already know how to think about it.
+
+::: {.notes}
+Land this hard and early. The single most useful demystifier in the whole talk: it is a conditional probability model over text. Not a database, not a search engine, not a brain. It *generates*, it does not *retrieve* --- which is exactly why it can be fluent and wrong (Josh's whole session).
+:::
+
+## How It "Reads": Tokens {style="font-size:90%;"}
+
+The model doesn't see words or letters --- it sees **tokens**: subword chunks.
+
+- `"statistician"` might split into `stat` + `ist` + `ician`.
+- `"unbelievable"` might be `un` + `believ` + `able`.
+- Common words = one token; rare words = several.
+- Numbers, whitespace, and punctuation are tokens too --- which is why models can be oddly bad at arithmetic.
+
+::: {.notes}
+Open tiktokenizer live. Type "The statistician computed a 95% confidence interval." Show the token boundaries and the integer IDs. Point out: the model's entire universe is a sequence of these integers. Context length, pricing, and the KV-cache (later) are all measured in tokens, not words.
+:::
+
+## {.svgslide}
+
+<object class="figsvg" tabindex="-1" type="image/svg+xml" data="tokens.svg" data-dur="11" data-loops="2" data-hold="0.9"></object>
+
+::: {.notes}
+**From Text to Token IDs.** Rail stage 1 of 5. The sentence is chopped into sub-word tokens and each chip gets an integer ID --- the payoff is the same one as the previous slide: from here on, the model only ever sees numbers. Everything downstream (embeddings, attention, scores) operates on these IDs.
+:::
+
+## Tokenizing Examples
+
+<div style="height:200px"></div>
+
+**How an interaction with LLMs are tokenized** [tiktokenizer.vercel.app](https://tiktokenizer.vercel.app) 
+
+## Tokens $\to$ a Distribution You Can Sample {style="font-size:80%;"}
+
+The model gives every candidate next token a score which is turned into probabilities; **temperature** controls how "peaked" the distribution is:
+
+- **Low temperature** $\to$ spiky $\to$ picks the most likely token *("greedy")*.
+    - Deterministic when `temperature = 0`
+- **High temperature** $\to$ flat $\to$ takes more risks *("creative" / hallucination-prone)*.
+
+*Where do the scores come from? From data.*  
+(A _lot_ of data.)
+
+::: {.notes}
+Concept slide, ~1 min. The single most useful framing for this audience: next-token prediction is a categorical distribution, and temperature is just a knob on its entropy. Argmax (Temp$\to$0) = greedy decoding. This is also the "modes" knob in disguise. Then move to the live demo to show the scores aren't magic --- they come from counting.
+:::
+
+## {.svgslide}
+
+<object class="figsvg" tabindex="-1" type="image/svg+xml" data="next_token_sampling.svg" data-dur="14" data-loops="2" data-hold="0.9"></object>
+
+::: {.notes}
+**Sequential Prediction.** The loop made visible: condition on the context, get P(next token), sample one, append it, repeat. This is the whole generation process --- each new token becomes part of the context for the next.
+:::
+
+## {.svgslide}
+
+<object class="figsvg" tabindex="-1" type="image/svg+xml" data="temperature.svg" data-dur="12" data-loops="2" data-hold="0.9"></object>
+
+::: {.notes}
+The same scores, sampled two ways. Low T sharpens toward the top pick ("summer" reliably); high T flattens so any of the plausible seasons can come out --- which is exactly where run-to-run non-determinism comes from. This is the knob the live demo lets them turn in a moment.
+:::
+
+## Two Phases of Training {style="font-size:88%;"}
+
+```{r}
+#| echo: false
+
+tibble(
+  Phase = c("Pre-training", "Post-training"),
+  `What happens` = c(
+    "Predict the next token over ~the whole internet. Unsupervised, enormously expensive.",
+    "Instruction tuning + <strong>RLHF</strong> (human/AI feedback). Cheaper, shapes behaviour."),
+  Analogy = c("Learns the <em>shape</em> of language",
+              "Learns to be <em>helpful and follow instructions</em>")
+) |>
+  kable(escape = FALSE) |>
+  kable_styling(font_size = 26, full_width = FALSE) |>
+  column_spec(1, bold = TRUE)
+```
+
+**Key point:** pre-training builds a raw next-token engine; post-training makes it answer *you* instead of just autocompleting.
+
+::: {.aside}
+**Fine-tuning** is post-training you do yourself: take a released model and keep training it on *your* data (your grading style, your domain) to specialize its behaviour --- far cheaper than pre-training from scratch.
+:::
+
+## "Modes": Fast vs. Reasoning {style="font-size:88%;"}
+
+Same model, different amount of *computation per answer*:
+
+- **Fast mode** --- answers immediately. Great for quick, low-stakes tasks.
+- **Reasoning / extended mode** --- the model first generates a long internal "thinking" trace (more tokens, more time, more cost) before answering. Better on multi-step problems.
+
+. . .
+
+We saw the mechanism already: **lower temperature + more tokens spent deliberating**. Reasoning is *the model writing out its work* before committing.
+
+::: {.notes}
+If you have a paid account handy, optionally show the same hard word-problem in fast vs. reasoning/extended-thinking mode and compare. Otherwise just describe. The honest framing: "thinking" = spending more tokens (compute) before the final answer. It genuinely helps on multi-step tasks; it is not consciousness.
+:::
+
+## Mechanical Takeaway {style="font-size:92%;"}
+
+
+LLMs **generates**.<br>It does not **retrieve**.
+
+. . .
+
+A fluent answer is a *high-probability* answer --- **not** a *true* one. That gap is why we have to be careful when evaluating what an LLM gives us for a response.
+
+. . .
+
+```{r}
+#| echo: false
+
+tibble(
+  ` ` = c("Fluent &amp; <strong>wrong</strong>", "Fluent &amp; <strong>right</strong>"),
+  `What it looks like` = c(
+    "\"A 95% confidence interval means there's a 95% chance the true parameter lies within the interval.\"",
+    "\"A 95% confidence interval is an interval procedure that, across repeated sampling, captures the true parameter 95% of the time.\""),
+  `What it is` = c(
+    "Statistically <em>incorrect</em>, but reads perfectly",
+    "Statistically <em>correct</em>, reads perfectly")
+) |>
+  kable(escape = FALSE) |>
+  kable_styling(font_size = 22, full_width = FALSE) |>
+  column_spec(1, bold = TRUE)
+```
+
+# A Peek Under the Hood
+
+## {.svgslide}
+
+<object class="figsvg" tabindex="-1" type="image/svg+xml" data="embeddings.svg" data-dur="10" data-loops="2" data-hold="0.9"></object>
+
+::: {.notes}
+**Tokens → Vectors: Embeddings.** Rail stage 2 of 5. Each token ID becomes a vector; similar tokens land as nearby points in a meaning-space (cup / mug / glass cluster). The key note --- "layers refine this with context" --- points straight ahead to the next slide: attention is what lets context reshape these vectors.
+:::
+
+## {.svgslide}
+
+<object class="figsvg" tabindex="-1" type="image/svg+xml" data="attention_anatomy.svg" data-dur="12" data-loops="2" data-hold="0.9"></object>
+
+::: {.notes}
+**Why "Attention"?** Rail stage 3 of 5. Pay-off for the objective "why is attention all you need?". The rail shows the forward pass: tokens $\to$ embeddings $\to$ attention $\to$ scores $\to$ next-token distribution. The "it" example is the punchline: attention lets every token look at every other token and decide what's relevant --- "it" resolves to *cup* or *bottle* depending on full/empty. "Attention Is All You Need" (Vaswani et al., NeurIPS 2017) introduced the **Transformer**, the architecture under nearly every modern LLM. *(Fun fact: co-author Aidan Gomez later founded Cohere, in Toronto.)*
+:::
+
+## {.svgslide}
+
+<object class="figsvg" tabindex="-1" type="image/svg+xml" data="scores.svg" data-dur="10" data-loops="2" data-hold="0.9"></object>
+
+::: {.notes}
+**From Vector to Scores.** Rail stage 4 of 5. The final vector becomes one logit per vocabulary token (Paris 14.2 ... pizza -2.1), and the ~50,000 reminder makes the scale concrete. Softmax turns those logits into probabilities --- and that softmax *is* the P(next token) distribution we opened the session with. Closes the loop back to the conditional-probability framing.
+:::
+
+## {.svgslide}
+
+<object class="figsvg" tabindex="-1" type="image/svg+xml" data="p_next_token.svg" data-dur="11" data-loops="2" data-hold="0.9"></object>
+
+# High Level --- Model Architectures
+
+## Architecture: Dense vs. Mixture-of-Experts {style="font-size:80%;"}
+
+- **Dense** --- *every* parameter fires for *every* token. Simple, predictable cost.
+- **MoE (Mixture of Experts)** --- a **router** determines which subset of the parameters to use and only a subset of parameters is active per token.
+  - Big *total* parameter count, small *active* count $\to$ more knowledge per unit of compute.
+  - *DeepSeek V4: ~1.6T total params, only ~49B active per token.*
+
+. . .
+
+**Cloud-based frontier models are almost certainly MoE** Claude Code, Google Gemini, OpenAI's ChatGPT, and so on.
+
+**Local models are split**
+
+- **MoE**: DeepSeek V4 · GPT-OSS-120B · Qwen3.6-**35B-A3B** · Mistral Large 3 · Cohere Command A+.
+- **Dense:** Qwen3.6-27B · Gemma 4 31B · Mistral Nemo 12B --- though even mid-size models now go MoE (Gemma 4's 26B).
+
+::: {.aside}
+"**35B-A3B**" = 35 billion total parameters, 3 billion active parameters. More parameters $\approx$ more "knowledge," but only *relatively*: more is not the same as correct.
+:::
+
+## Why This Matters to You {style="font-size:90%;"}
+
+- **Capable open-weight models now run on a laptop** --- private, offline, zero-marginal-cost AI on your own hardware.
+- **The number you'll see quoted ("7B", "70B", "671B")** is parameters --- a rough proxy for knowledge, not a guarantee of accuracy.
+- **Hugging Face** is the "**GitHub for model weights**" --- where open-weight models live and get downloaded.
+
+::: {.notes}
+Bridge: now that you know what the thing is and what runs it, where do you actually *meet* one? That's the surfaces tour.
+:::
+
+# Where You Meet an LLM: Surfaces
+
+## The Four Surfaces {style="font-size:88%;"}
+
+```{r}
+#| echo: false
+
+tibble(
+  Surface = c("Chat", "Programmatic (API)"),
+  Cloud = c("ChatGPT, Claude, Gemini, Copilot", "OpenAI / Anthropic / Google APIs"),
+  Local = c("LM Studio, Ollama, Open WebUI", "vLLM, Ollama server, llama.cpp")
+) |> 
+  kable(escape = FALSE,
+        col.names = c(" ", "Cloud (easy, powerful)", "Local (private, your control)")) |>
+  kable_styling(font_size = 28, full_width = FALSE) |>
+  # row_spec(1, bold = TRUE) |> 
+  column_spec(1, bold = TRUE, width = "2em")
+```
+
+
+Same underlying technology --- **four very different experiences**.
+
+::: {.aside}
+Major model providers (early 2026): OpenAI, Anthropic, Google, xAI, Mistral, Meta, DeepSeek --- plus **Cohere**, a Canadian (Toronto) *enterprise AI-model* provider. (Cohere builds models; it isn't a cloud-infrastructure provider.)
+:::
+
+## Choosing a Surface: The Trade-offs {style="font-size:86%;"}
+
+```{r}
+#| echo: false
+#| results: "asis"
+
+surface_tradeoffs <- tibble(
+  Item = c("Raw capability", "Cost at scale", "Privacy / sensitive data",
+           "Friction to start", "Reproducibility / control"),
+  Cloud = c("frontier models", "per-token", "leaves your machine",
+            "open a tab", "models change"),
+  Local = c("smaller models", "free after hardware", "never leaves",
+            "setup, GPU", "you pin the version")
+)
+
+kable(surface_tradeoffs, escape = FALSE,
+      col.names = c("You care about...", "Lean <strong>Cloud</strong>", "Lean <strong>Local</strong>"),
+      booktabs = TRUE, lineend = "") |>
+  kable_styling(font_size = 28, full_width = TRUE) |>  
+  column_spec(1, bold = TRUE, width = "8em")
+```
+
+. . .
+
+**For education** *student data* pushes us toward **local**.  
+**For research** *intellectual property* pushes us toward **local**.
+
+::: {.notes}
+Foreshadow the 3D ladder: chat is mostly *discussion*; APIs and local servers are what you need for *delegation* and *distribution* at scale. The surface you pick is partly determined by which rung you're climbing.
+:::
+
+# Talking to the Model: Prompting
+
+## The Prompting Mindset {style="font-size:92%;"}
+
+Remember the conditional distribution? **A prompt is how you condition it.**
+
+You're not "asking a question" so much as **steering the model toward the region of high-probability text you want.**
+
+Three reliable levers --- we will see each:
+
+1. **Clear instructions**
+2. **Few-shot examples**
+3. **System vs. user roles**
+
+:::{.aside}
+Having to repeat this with every new conversation can be tedious. This is the purpose of Custom GPTs, Gemini Gems, Claude Projects, and related.
+
+This is also the purpose of `AGENTS.md` (`CLAUDE.md`) when working with CLI tools.
+:::
+
+::: {.notes}
+This session is presenter-driven (demo, not hands-on). Have one chat window pre-opened and zoomed up. Keep each demo to ~2 min. The throughline: every technique is just *better conditioning* of the same distribution they saw in the softmax demo.
+:::
+
+## Lever 1: Clear Instructions {style="font-size:84%;"}
+
+Vague in $\to$ vague out. Be explicit about **task, format, constraints, audience.**
+
+::: {.fragment}
+**Weak:** *"Tell me about confidence intervals."*
+:::
+
+::: {.fragment}
+**Strong:** *"Explain a 95% confidence interval to a first-year stats student in 3 sentences. Use a concrete polling example. Avoid the word 'probability.'"*
+:::
+
+::: {.notes}
+Run both live. The contrast is stark and immediate. Point out you specified: audience, length, a concrete anchor, and a constraint. Each clause prunes the distribution.
+:::
+
+## Lever 2: Few-Shot Examples {style="font-size:82%;"}
+
+Show the pattern instead of describing it. "Here's what good looks like":
+
+> Convert to APA in-text citation:
+> 
+> Smith 2020 -> (Smith, 2020)  
+> Lee and Park 2019 -> (Lee & Park, 2019)  
+> Garcia et al 2021 ->
+
+The model completes the pattern. Powerful for **structured, repetitive** tasks --- exactly the teaching work we'll automate this afternoon.
+
+- Zero-shot: "no examples", just instructions.
+- Fine-tuning: a large corpus of examples and counter-examples.
+
+::: {.notes}
+Live: paste this, let it complete "(Garcia et al., 2021)". Then add a tricky one. The lesson: a couple of examples beats a paragraph of instructions for formatting/extraction tasks. This is the seed of the session 4b teaching-workflow idea.
+:::
+
+## Lever 3: System vs. User Roles {style="font-size:84%;"}
+
+- **System prompt** --- the standing rules / persona / constraints. Set once.
+- **User prompt** --- the actual turn-by-turn request.
+
+> *System:* "You are a meticulous TA. You never give the final answer; you give one hint."
+> *User:* "How do I start this hypothesis test?"
+
+Separating *who the model is* from *what you're asking* makes behaviour **consistent** across many requests.
+
+::: {.notes}
+This is the hinge to programmatic use: in the API, the system prompt is where teaching-workflow guardrails live. In chat, "custom instructions"/"projects" are the same idea. Consistency is the selling point.
+:::
+
+## Stuck on Prompting? {style="font-size:88%;"}
+
+The best expert on prompting an LLM is **the LLM itself.**
+
+- **Ask it to draft the prompt** --- describe your goal and let it write the wording.
+- **Have it interview you** --- make the model surface the details you left out:
+
+> *"I want [XYZ]. Ask me questions about this, one at a time, until we both understand every aspect of [XYZ] --- then write the prompt for me."*
+
+::: {.notes}
+The meta-move: you don't have to be a prompt expert when a prompt expert is one message away. The "interview me" pattern is the high-value one --- it forces *you* to clarify the task, which is usually where vague prompts come from in the first place. Ties back to Lever 1 (clear instructions).
+:::
+
+## Context: The Model's Working Memory {style="font-size:82%;"}
+
+Everything the model can "see" lives in its **context window** --- measured in **tokens**.
+
+- System prompt + your messages + its replies + any **attached documents** all consume context.
+- The **KV-cache** is what makes this efficient (it remembers the processed context so it needn't re-read every token).
+- **Tools** extend context beyond the chat: **MCP** servers, **skills**, and project files like **`AGENTS.md`** let the model pull in --- and act on --- the right information.
+
+::: {.notes}
+Don't go deep --- just plant the vocabulary. "Why did it forget what I said?" $\to$ it fell out of the context window. "How does it use my files?" $\to$ tools/MCP. This sets up the afternoon agentic-CLI material (Josh) and the distribution rung. KV-cache is a one-liner: it's why long chats feel fast.
+:::
+
+# My LLM Use
+
+## Models in the Mix
+
+- Claude is my "daily driver".
+- Flip between ChatGPT and Gemini for web UI interactions as well.
+- GitHub's Copilot for code completion (RStudio / Positron)
+- Qwen3.6-35B for my local LLM almost exclusively.
+
+
+## Tools Built with AI {style="font-size:74%;"}
+
+Everything here runs on **my own hardware** --- private, offline-capable, no per-token bill:
+
+```{r}
+#| echo: false
+
+tibble(
+  Tool = c("Notes MD", "Voicenotes", "Gregory Gradington", "Honest Oliver",
+           "Raggedy Android", "Evangeline", "Octavius", "Voxtral / XTTS-v2"),
+  `What it does` = c(
+    "Snap a photo of handwritten notes → vision LLM → clean Markdown (LaTeX/diagrams)",
+    "Speak → transcribed, summarized notes",
+    "Grades Quarto submissions part-by-part against a rubric, with feedback",
+    "Flags similarity across student submissions, solutions, and AI-generated answers",
+    "RAG over a pile of PDFs — ask questions, get sourced answers (Discord bot)",
+    "Semantic search over my email",
+    "Self-hosted voice assistant with tool access (MCP)",
+    "Speech-to-text &amp; text-to-speech endpoints (incl. voice cloning)")
+) |>
+  kable(escape = FALSE) |>
+  kable_styling(font_size = 22, full_width = FALSE) |>
+  column_spec(1, bold = TRUE)
+```
+
+::: {.aside}
+Built using a combination of cloud and local models. Tools _only_ use local LLMs. The point isn't the tools --- it's that *all of this is now buildable by one statistician.*
+:::
+
+<!-- ## These Tools Live All Over the Ladder {style="font-size:86%;"}
+
+- **Notes MD, Voicenotes, Evangeline** --- I ask, it answers / fetches. *(Discussion / light delegation.)*
+- **Gregory, Honest Oliver, Raggedy Android** --- I hand off a scoped job; I review the output. *(Delegation.)*
+- **Gregory grading a whole class at once** --- many runs, I oversee the process. *(Distribution.)*
+
+. . .
+
+That spectrum --- *I think* $\to$ *I hand off* $\to$ *I orchestrate* --- **is the framework we want to keep in mind today.**
+
+::: {.notes}
+This is the deliberate bridge into the 3D ladder. The showcase isn't a brag reel; it's a worked example of the framework you're about to give them. Keep it to ~5-6 min --- show one or two screenshots if you have them, then move.
+::: -->
+
+# The 3D Autonomy Ladder
+
+## {.svgslide}
+
+<object class="figsvg" tabindex="-1" type="image/svg+xml" data="ladder.svg" data-dur="12" data-loops="2" data-hold="0.9"></object>
+
+::: {.notes}
+The spine of the whole day. Three rungs --- discussion, delegation, distribution --- and the punchline baked into the figure: as you climb, the model takes on more and the *audit burden* climbs right with it. Knowing how to verify is the skill that has to scale with you. The next slides break the rungs out and then turn the audit point into its own slide.
+:::
+
+<!-- ## The 3 Rungs {style="font-size:80%;"}
+
+How much autonomy are you handing the model?
+
+```{r}
+#| echo: false
+
+tibble(
+  Rung = c("1", "2", "3"),
+  Name = c("Discussion", "Delegation", "Distribution"),
+  `What it means` = c(
+    "Active back-and-forth. <em>You</em> do all the thinking.",
+    "Hand off a scoped task. You review &amp; verify.",
+    "Orchestrate across many runs / agents. You oversee."),
+  Example = c("Asking Claude to explain a concept",
+              "\"Summarize this paper\"; generate practice problems",
+              "Agentic CLI workflow; grade a whole class")
+) |>
+  kable(escape = FALSE) |>
+  kable_styling(font_size = 24, full_width = FALSE) |>
+  column_spec(1:2, bold = TRUE)
+```
+
+::: {.r-fit-text}
+Discussion $\to$ Delegation $\to$ Distribution
+:::
+
+## As You Climb, the Audit Changes {style="font-size:84%;"}
+
+```{r}
+#| echo: false
+
+tibble(
+  Rung = c("Discussion", "Delegation", "Distribution"),
+  `What you must check` = c(
+    "Is the <em>premise</em> sound? Is it answering what I asked?",
+    "Does the output <em>match the source</em>? Are the facts right?",
+    "Are <em>all</em> the runs sound? Real citations? Complete search?")
+) |>
+  kable(escape = FALSE) |>
+  kable_styling(font_size = 26, full_width = FALSE) |>
+  column_spec(1, bold = TRUE)
+```
+
+> **The core principle of the day:** more autonomy $\to$ more output you didn't watch being made $\to$ **more discipline required to verify it.**
+
+::: {.notes}
+This slide is the literal handoff to Pillar (b). The trap is that climbing the ladder *feels* like less work, while it actually demands *more* verification skill. That inversion is the thing to leave them chewing on over coffee.
+::: -->
+
+## $\ $
+
+<center><h2>Thank you!</h2></center>
+
+<br><br><br>
+
+**Next up:** coffee, then **Josh on Audit Literacy** at 10:30.
+
+::: {.notes}
+Keep questions tight --- there's a whole day for depth, and a hard 10:15 stop for coffee. Hand off cleanly to Josh.
+:::

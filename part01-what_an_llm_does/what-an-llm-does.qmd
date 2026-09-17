@@ -1,0 +1,151 @@
+---
+title: "AI and LLMs"
+subtitle: "What an LLM Actually Does"
+author: "David Riegert"
+engine: knitr
+execute:
+  echo: true
+format:
+  revealjs:
+    theme: default
+    margin: 0.05
+    incremental: false
+    logo: TUPMS.png
+    css: style.css
+    include-after-body: replay-svg.html
+    pdf-separate-fragments: false
+slide-number: true
+smaller: false
+---
+
+```{r}
+#| label: packages
+#| include: false
+
+library(tidyverse)
+library(tidyr)
+library(knitr)
+library(kableExtra)
+
+options(knitr.table.format = "html")  # honour escape = FALSE so <strong>/<em> in cells render
+theme_set(theme_bw())
+```
+
+# What an LLM Actually Does
+
+## The Whole Trick: Predict the Next Token {style="font-size:95%;"}
+
+> An LLM is a function that, given the text so far, outputs a **probability distribution over what comes next** --- then samples from it. Repeat.
+
+. . .
+
+That's it. Everything else --- "reasoning," "writing code," "knowing facts" --- is this loop running over and over.
+
+. . .
+
+This is a *conditional distribution*.
+
+$$
+P(\text{next token} \mid \text{all previous tokens})
+$$
+
+## How It "Reads": Tokens {style="font-size:90%;"}
+
+The model doesn't see words or letters --- it sees **tokens**: subword chunks.
+
+- `"statistician"` might split into `stat` + `ist` + `ician`.
+- `"unbelievable"` might be `un` + `believ` + `able`.
+- Common words = one token; rare words = several.
+- Numbers, whitespace, and punctuation are tokens too --- which is why models can be oddly bad at arithmetic.
+
+## {.svgslide}
+
+<object class="figsvg" tabindex="-1" type="image/svg+xml" data="tokens.svg" data-dur="11" data-loops="2" data-hold="0.9"></object>
+
+## Tokenizing Examples
+
+<div style="height:200px"></div>
+
+**How an interaction with LLMs are tokenized** [tiktokenizer.vercel.app](https://tiktokenizer.vercel.app) 
+
+## Tokens $\to$ a Distribution You Can Sample {style="font-size:80%;"}
+
+The model gives every candidate next token a score which is turned into probabilities; **temperature** controls how "peaked" the distribution is:
+
+- **Low temperature** $\to$ spiky $\to$ picks the most likely token *("greedy")*.
+    - Deterministic when `temperature = 0`
+- **High temperature** $\to$ flat $\to$ takes more risks *("creative" / hallucination-prone)*.
+
+*Where do the scores come from? From data.*  
+(A _lot_ of data.)
+
+## {.svgslide}
+
+<object class="figsvg" tabindex="-1" type="image/svg+xml" data="next_token_sampling.svg" data-dur="14" data-loops="2" data-hold="0.9"></object>
+
+## {.svgslide}
+
+<object class="figsvg" tabindex="-1" type="image/svg+xml" data="temperature.svg" data-dur="12" data-loops="2" data-hold="0.9"></object>
+
+## Two Phases of Training {style="font-size:88%;"}
+
+```{r}
+#| echo: false
+
+tibble(
+  Phase = c("Pre-training", "Post-training"),
+  `What happens` = c(
+    "Predict the next token over ~the whole internet. Unsupervised, enormously expensive.",
+    "Instruction tuning + <strong>RLHF</strong> (human/AI feedback). Cheaper, shapes behaviour."),
+  Analogy = c("Learns the <em>shape</em> of language",
+              "Learns to be <em>helpful and follow instructions</em>")
+) |>
+  kable(escape = FALSE) |>
+  kable_styling(font_size = 26, full_width = FALSE) |>
+  column_spec(1, bold = TRUE)
+```
+
+**Key point:** pre-training builds a raw next-token engine; post-training makes it answer *you* instead of just autocompleting.
+
+::: {.aside}
+**Fine-tuning** is post-training you do yourself: take a released model and keep training it on *your* data (your grading style, your domain) to specialize its behaviour --- far cheaper than pre-training from scratch.
+:::
+
+## "Modes": Fast vs. Reasoning {style="font-size:88%;"}
+
+Often the same model, but a different amount of *computation per answer*:
+
+- **Fast mode** --- answers immediately. Great for quick, low-stakes tasks.
+- **Reasoning / extended mode** --- the model first generates a long internal "thinking" trace (more tokens, more time, more cost) before answering. Better on multi-step problems.
+
+. . .
+
+We often do not see the generated intermediate tokens (the "thinking trace"). What we see is the final output.
+
+## Mechanical Takeaway {style="font-size:92%;"}
+
+
+LLMs **generates**.<br>It does not **retrieve**.
+
+. . .
+
+A fluent answer is a *high-probability* answer --- **not** a *true* one. That gap is why we have to be careful when evaluating what an LLM gives us for a response.
+
+. . .
+
+```{r}
+#| echo: false
+
+tibble(
+  ` ` = c("Fluent &amp; <strong>wrong</strong>", "Fluent &amp; <strong>right</strong>"),
+  `What it looks like` = c(
+    "\"A 95% confidence interval means there's a 95% chance the true parameter lies within the interval.\"",
+    "\"A 95% confidence interval is an interval procedure that, across repeated sampling, captures the true parameter 95% of the time.\""),
+  `What it is` = c(
+    "Statistically <em>incorrect</em>, but reads perfectly",
+    "Statistically <em>correct</em>, reads perfectly")
+) |>
+  kable(escape = FALSE) |>
+  kable_styling(font_size = 22, full_width = FALSE) |>
+  column_spec(1, bold = TRUE)
+```
