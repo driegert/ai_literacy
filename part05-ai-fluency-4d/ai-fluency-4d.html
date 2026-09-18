@@ -1350,7 +1350,7 @@ border: 0;
 
 <section id="title-slide" class="quarto-title-block center">
   <h1 class="title">AI and LLMs</h1>
-  <p class="subtitle">What an LLM Actually Does</p>
+  <p class="subtitle">AI Fluency: The 4D Framework</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -1362,145 +1362,224 @@ David Riegert
 
 </section>
 <section>
-<section id="what-an-llm-actually-does" class="title-slide slide level1 center">
-<h1>What an LLM Actually Does</h1>
+<section id="ai-fluency-the-4d-framework" class="title-slide slide level1 center">
+<h1>AI Fluency: The 4D Framework</h1>
 
 </section>
-<section id="the-whole-trick-predict-the-next-token" class="slide level2" style="font-size:95%;">
-<h2>The Whole Trick: Predict the Next Token</h2>
+<section id="what-is-ai-fluency" class="slide level2" style="font-size:95%;">
+<h2>What Is AI Fluency?</h2>
 <blockquote>
-<p>An LLM is a function that, given the text so far, outputs a <strong>probability distribution over what comes next</strong> — then samples from it. Repeat.</p>
+<p><strong>AI Fluency</strong> is “the ability to effectively, ethically, and safely understand, evaluate, and collaborate with artificial intelligence systems.”</p>
 </blockquote>
 <div class="fragment">
-<p>That’s it. Everything else — “reasoning,” “writing code,” “knowing facts” — is this loop running over and over.</p>
+<p>It is <strong>not</strong> about getting better answers faster — it is about <strong>building better judgment</strong>.</p>
 </div>
 <div class="fragment">
-<p>This is a <em>conditional distribution</em>.</p>
-<p><span class="math display">\[
-P(\text{next token} \mid \text{all previous tokens})
-\]</span></p>
-</div>
-</section>
-<section id="how-it-reads-tokens" class="slide level2" style="font-size:90%;">
-<h2>How It “Reads”: Tokens</h2>
-<p>The model doesn’t see words or letters — it sees <strong>tokens</strong>: subword chunks.</p>
-<ul>
-<li><code>&quot;statistician&quot;</code> might split into <code>stat</code> + <code>ist</code> + <code>ician</code>.</li>
-<li><code>&quot;unbelievable&quot;</code> might be <code>un</code> + <code>believ</code> + <code>able</code>.</li>
-<li>Common words = one token; rare words = several.</li>
-<li>Numbers, whitespace, and punctuation are tokens too — which is why models can be oddly bad at arithmetic.</li>
-</ul>
-</section>
-<section id="section" class="slide level2 svgslide">
-<h2></h2>
-<object class="figsvg" tabindex="-1" type="image/svg+xml" data="tokens.svg" data-dur="11" data-loops="2" data-hold="0.9">
-</object>
-</section>
-<section id="tokenizing-examples" class="slide level2">
-<h2>Tokenizing Examples</h2>
-<div style="height:200px">
+<p>AI Fluency means interacting with AI systems in ways that are <strong>effective, efficient, ethical, and safe</strong> — regardless of which models or tools emerge.</p>
 
 </div>
-<p><strong>How an interaction with LLMs are tokenized</strong> <a href="https://tiktokenizer.vercel.app">tiktokenizer.vercel.app</a></p>
-</section>
-<section id="tokens-to-a-distribution-you-can-sample" class="slide level2" style="font-size:80%;">
-<h2>Tokens <span class="math inline">\(\to\)</span> a Distribution You Can Sample</h2>
-<p>The model gives every candidate next token a score which is turned into probabilities; <strong>temperature</strong> controls how “peaked” the distribution is:</p>
-<ul>
-<li><strong>Low temperature</strong> <span class="math inline">\(\to\)</span> spiky <span class="math inline">\(\to\)</span> picks the most likely token <em>(“greedy”)</em>.
-<ul>
-<li>Deterministic when <code>temperature = 0</code></li>
-</ul></li>
-<li><strong>High temperature</strong> <span class="math inline">\(\to\)</span> flat <span class="math inline">\(\to\)</span> takes more risks <em>(“creative” / hallucination-prone)</em>.</li>
-</ul>
-<p><em>Where do the scores come from? From data.</em><br>
-(A <em>lot</em> of data.)</p>
-</section>
-<section id="section-1" class="slide level2 svgslide">
-<h2></h2>
-<object class="figsvg" tabindex="-1" type="image/svg+xml" data="next_token_sampling.svg" data-dur="14" data-loops="2" data-hold="0.9">
-</object>
-</section>
-<section id="section-2" class="slide level2 svgslide">
-<h2></h2>
-<object class="figsvg" tabindex="-1" type="image/svg+xml" data="temperature.svg" data-dur="12" data-loops="2" data-hold="0.9">
-</object>
-</section>
-<section id="two-phases-of-training" class="slide level2" style="font-size:88%;">
-<h2>Two Phases of Training</h2>
-<div class="cell">
-<div class="cell-output-display">
-<table class="table caption-top" style="font-size: 26px; width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">Phase</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">What happens</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">Analogy</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">Pre-training</td>
-<td style="text-align: left;">Predict the next token over ~the whole internet. Unsupervised, enormously expensive.</td>
-<td style="text-align: left;">Learns the <em>shape</em> of language</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">Post-training</td>
-<td style="text-align: left;">Instruction tuning + <strong>RLHF</strong> (human/AI feedback). Cheaper, shapes behaviour.</td>
-<td style="text-align: left;">Learns to be <em>helpful and follow instructions</em></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p><strong>Key point:</strong> pre-training builds a raw next-token engine; post-training makes it answer <em>you</em> instead of just autocompleting.</p>
-
 <aside><div>
-<p><strong>Fine-tuning</strong> is post-training you do yourself: take a released model and keep training it on <em>your</em> data (your grading style, your domain) to specialize its behaviour — far cheaper than pre-training from scratch.</p>
+<p>Framework: Rick Dakan &amp; Joseph Feller, with Anthropic (2025). Released under CC BY-NC-SA 4.0. Companion courses: <em>AI Fluency: Framework &amp; Foundations</em> and <em>AI Fluency for Students</em> (Anthropic Academy, free).</p>
 </div></aside></section>
-<section id="modes-fast-vs.-reasoning" class="slide level2" style="font-size:88%;">
-<h2>“Modes”: Fast vs. Reasoning</h2>
-<p>Often the same model, but a different amount of <em>computation per answer</em>:</p>
-<ul>
-<li><strong>Fast mode</strong> — answers immediately. Great for quick, low-stakes tasks.</li>
-<li><strong>Reasoning / extended mode</strong> — the model first generates a long internal “thinking” trace (more tokens, more time, more cost) before answering. Better on multi-step problems.</li>
-</ul>
-<div class="fragment">
-<p>We often do not see the generated intermediate tokens (the “thinking trace”). What we see is the final output.</p>
-</div>
-</section>
-<section id="mechanical-takeaway" class="slide level2" style="font-size:92%;">
-<h2>Mechanical Takeaway</h2>
-<p>LLMs <strong>generates</strong>.<br>It does not <strong>retrieve</strong>.</p>
-<div class="fragment">
-<p>A fluent answer is a <em>high-probability</em> answer — <strong>not</strong> a <em>true</em> one. That gap is why we have to be careful when evaluating what an LLM gives us for a response.</p>
-</div>
-<div class="fragment">
+<section id="the-4d-framework" class="slide level2" style="font-size:90%;">
+<h2>The 4D Framework</h2>
 <div class="cell">
 <div class="cell-output-display">
 <table class="table caption-top" style="font-size: 22px; width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">What it looks like</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">What it is</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">D</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Question</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Official</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left; font-weight: bold;">Fluent &amp; <strong>wrong</strong></td>
-<td style="text-align: left;">&quot;A 95% confidence interval means there&#39;s a 95% chance the true parameter lies within the interval.&quot;</td>
-<td style="text-align: left;">Statistically <em>incorrect</em>, but reads perfectly</td>
+<td style="text-align: left; font-weight: bold;">Delegation</td>
+<td style="text-align: left;">Should AI do this --- and how much of it?</td>
+<td style="text-align: left;">Setting goals and deciding whether, when and how to engage with AI.</td>
 </tr>
 <tr class="even">
-<td style="text-align: left; font-weight: bold;">Fluent &amp; <strong>right</strong></td>
-<td style="text-align: left;">&quot;A 95% confidence interval is an interval procedure that, across repeated sampling, captures the true parameter 95% of the time.&quot;</td>
-<td style="text-align: left;">Statistically <em>correct</em>, reads perfectly</td>
+<td style="text-align: left; font-weight: bold;">Description</td>
+<td style="text-align: left;">Do I know how to ask for what I want?</td>
+<td style="text-align: left;">Effectively describing goals to prompt useful AI behaviors and outputs.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Discernment</td>
+<td style="text-align: left;">How good is what I got back, really?</td>
+<td style="text-align: left;">Accurately assessing the usefulness of AI outputs and behaviors.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Diligence</td>
+<td style="text-align: left;">Who is accountable for the outcome?</td>
+<td style="text-align: left;">Taking responsibility for what we do with AI and how we do it.</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
+<p>Four <strong>interconnected</strong> competencies — each is a collection of skills, knowledge, insights, and values, not a checkbox.</p>
+</section>
+<section id="the-four-ds-in-practice" class="slide level2" style="font-size:88%;">
+<h2>The Four Ds in Practice</h2>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table caption-top" style="font-size: 24px; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">D</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">In our context</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Delegation</td>
+<td style="text-align: left;">Grading: AI drafts feedback, human owns the judgment.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Description</td>
+<td style="text-align: left;">A prompt is a conditional distribution --- audience, length, format, constraints.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Discernment</td>
+<td style="text-align: left;">Fluent $ eq$ true: audit before you trust (that whole morning session).</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Diligence</td>
+<td style="text-align: left;">Your name is on the work --- disclose and stand behind AI-assisted output.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section></section>
+<section>
+<section id="delegation" class="title-slide slide level1 center">
+<h1>Delegation</h1>
+
+</section>
+<section id="d1-delegation" class="slide level2" style="font-size:90%;">
+<h2>D1 — Delegation</h2>
+<p><strong>Setting goals and deciding whether, when, and how to engage with AI.</strong></p>
+<ul>
+<li>Understand your <strong>goal</strong> before touching the tool.</li>
+<li>Know the <strong>capability envelope</strong>: what AI is good, weak, or forbidden at.</li>
+<li>Make a <em>strategic choice</em> about the split between human and machine work — <strong>not</strong> “do it all myself” or “do it all for me”.</li>
+</ul>
+<div class="fragment">
+<p><strong>Default-to-automation is the failure mode:</strong> asking AI to do the whole task because it’s easiest. That’s the concern behind every academic-integrity policy — and the reason delegation is D1.</p>
+</div>
+</section></section>
+<section>
+<section id="description" class="title-slide slide level1 center">
+<h1>Description</h1>
+
+</section>
+<section id="d2-description" class="slide level2" style="font-size:90%;">
+<h2>D2 — Description</h2>
+<p><strong>Effectively describing goals to prompt useful AI behaviors and outputs.</strong></p>
+<p>Three sub-skills:</p>
+<ul>
+<li><strong>Product description</strong> — what you want, in terms of <em>output, format, audience, style</em>.</li>
+<li><strong>Process description</strong> — how you want the work done (steps, constraints, “don’ts”).</li>
+<li><strong>Behavior description</strong> — how you want the AI to <em>act</em> (persona, rules, escalation).</li>
+</ul>
+<div class="fragment">
+<p>This is the <strong>Prompting</strong> session made formal: every lever from that talk (clear instructions, few-shot examples, system roles) is Description competence.</p>
+</div>
+</section></section>
+<section>
+<section id="discernment" class="title-slide slide level1 center">
+<h1>Discernment</h1>
+
+</section>
+<section id="d3-discernment" class="slide level2" style="font-size:90%;">
+<h2>D3 — Discernment</h2>
+<p><strong>Accurately assessing the usefulness of AI outputs and behaviors.</strong></p>
+<p>Remember part 1: a fluent answer is a <em>high-probability</em> answer — <strong>not</strong> a <em>true</em> one.</p>
+<div class="fragment">
+<p>Discernment in practice:</p>
+<ul>
+<li><strong>Verify, don’t just read</strong> — especially numbers, citations, and statistical claims.</li>
+<li><strong>Artifact effect</strong>: the more polished the output, the <em>less</em> people check it — fluency is a sedative.</li>
+<li><strong>Iteration</strong>: refine, don’t settle — the single strongest correlate of good AI use in Anthropic’s data.</li>
+</ul>
+
+</div>
+<aside><div>
+<p>This is where the <strong>audit-literacy</strong> session (session 2) plugs in: checking output is the practiced form of Discernment.</p>
+</div></aside></section></section>
+<section>
+<section id="diligence" class="title-slide slide level1 center">
+<h1>Diligence</h1>
+
+</section>
+<section id="d4-diligence" class="slide level2" style="font-size:90%;">
+<h2>D4 — Diligence</h2>
+<p><strong>Taking responsibility for what we do with AI and how we do it.</strong></p>
+<ul>
+<li><strong>Accountability</strong> — you own the output. “The model did it” is not a defense.</li>
+<li><strong>Transparency</strong> — disclose AI involvement where it matters (assignments, publications, student work).</li>
+<li><strong>Ethics</strong> — data privacy, IP, fairness: <em>how</em> you do it with AI counts as much as <em>what</em> you do.</li>
+</ul>
+<div class="fragment">
+<p>The other three Ds make AI <strong>useful</strong>; Diligence keeps it <strong>legitimate</strong>.</p>
+</div>
+</section></section>
+<section>
+<section id="three-modes-of-interaction" class="title-slide slide level1 center">
+<h1>Three Modes of Interaction</h1>
+
+</section>
+<section id="automation-augmentation-agency" class="slide level2" style="font-size:88%;">
+<h2>Automation, Augmentation, Agency</h2>
+<p>The framework’s second axis: <strong>how</strong> you hand work over.</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table caption-top" style="font-size: 26px; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Mode</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Automation</td>
+<td style="text-align: left;">AI **executes** specific tasks based on human instruction.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Augmentation</td>
+<td style="text-align: left;">Humans and AI **collaborate** as thinking partners.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Agency</td>
+<td style="text-align: left;">Humans **configure** AI to independently perform tasks on their behalf.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<aside><div>
+<p>Notice the gradient: more capability, <strong>more autonomy</strong> — and, per the audit ladder, more checking required at every step up.</p>
+</div></aside></section></section>
+<section>
+<section id="where-this-fits" class="title-slide slide level1 center">
+<h1>Where This Fits</h1>
+
+</section>
+<section id="d-times-the-rest-of-the-day" class="slide level2" style="font-size:90%;">
+<h2>4D <span class="math inline">\(\times\)</span> the Rest of the Day</h2>
+<p>The 4D framework organizes <strong>how well</strong> you work with AI. The 3D Autonomy Ladder from session 1 organizes <strong>how much</strong> you hand off.</p>
+<ul>
+<li><strong>Delegation</strong> <span class="math inline">\(\leftrightarrow\)</span> choosing your rung on the autonomy ladder</li>
+<li><strong>Description</strong> <span class="math inline">\(\leftrightarrow\)</span> the prompting session (how to condition the distribution)</li>
+<li><strong>Discernment</strong> <span class="math inline">\(\leftrightarrow\)</span> the audit-literacy session (checking, not trusting)</li>
+<li><strong>Diligence</strong> <span class="math inline">\(\leftrightarrow\)</span> the guardrails: policy, disclosure, your own standards</li>
+</ul>
+<div class="fragment">
+<p><strong>Takeaway:</strong> the tools and models will keep changing. Fluency is the part that doesn’t — and it is what you leave this day with.</p>
 
 </div>
 </section></section>
