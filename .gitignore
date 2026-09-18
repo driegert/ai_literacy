@@ -1,6 +1,6 @@
 # Quarto build outputs (regenerated on render)
 *_files/
-*.html
+
 # ...but replay-svg.html is a SOURCE file (include-after-body), not an output
 !replay-svg.html
 
