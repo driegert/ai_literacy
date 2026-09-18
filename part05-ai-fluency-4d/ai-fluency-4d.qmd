@@ -1,0 +1,197 @@
+---
+title: "AI and LLMs"
+subtitle: "AI Fluency: The 4D Framework"
+author: "David Riegert"
+engine: knitr
+execute:
+  echo: true
+format:
+  revealjs:
+    theme: default
+    margin: 0.05
+    incremental: false
+    logo: TUPMS.png
+    css: style.css
+    include-after-body: replay-svg.html
+    pdf-separate-fragments: false
+slide-number: true
+smaller: false
+---
+
+```{r}
+#| label: packages
+#| include: false
+
+library(tidyverse)
+library(tidyr)
+library(knitr)
+library(kableExtra)
+
+options(knitr.table.format = "html")  # honour escape = FALSE so <strong>/<em> in cells render
+theme_set(theme_bw())
+```
+
+# AI Fluency: The 4D Framework
+
+## What Is AI Fluency? {style="font-size:95%;"}
+
+> **AI Fluency** is "the ability to effectively, ethically, and safely understand, evaluate, and collaborate with artificial intelligence systems."
+
+. . .
+
+It is **not** about getting better answers faster --- it is about **building better judgment**.
+
+. . .
+
+AI Fluency means interacting with AI systems in ways that are **effective, efficient, ethical, and safe** --- regardless of which models or tools emerge.
+
+::: {.aside}
+Framework: Rick Dakan & Joseph Feller, with Anthropic (2025). Released under CC BY-NC-SA 4.0. Companion courses: *AI Fluency: Framework & Foundations* and *AI Fluency for Students* (Anthropic Academy, free).
+:::
+
+## The 4D Framework {style="font-size:90%;"}
+
+```{r}
+#| echo: false
+
+tibble(
+  D = c("Delegation", "Description", "Discernment", "Diligence"),
+  Question = c(
+    "Should AI do this --- and how much of it?",
+    "Do I know how to ask for what I want?",
+    "How good is what I got back, really?",
+    "Who is accountable for the outcome?"),
+  Official = c(
+    "Setting goals and deciding whether, when and how to engage with AI.",
+    "Effectively describing goals to prompt useful AI behaviors and outputs.",
+    "Accurately assessing the usefulness of AI outputs and behaviors.",
+    "Taking responsibility for what we do with AI and how we do it.")
+) |>
+  kable(escape = FALSE) |>
+  kable_styling(font_size = 22, full_width = FALSE) |>
+  column_spec(1, bold = TRUE)
+```
+
+Four **interconnected** competencies --- each is a collection of skills, knowledge, insights, and values, not a checkbox.
+
+## The Four Ds in Practice {style="font-size:88%;"}
+
+```{r}
+#| echo: false
+
+tibble(
+  D = c("Delegation", "Description", "Discernment", "Diligence"),
+  `In our context` = c(
+    "Grading: AI drafts feedback, human owns the judgment.",
+    "A prompt is a conditional distribution --- audience, length, format, constraints.",
+    "Fluent $\neq$ true: audit before you trust (that whole morning session).",
+    "Your name is on the work --- disclose and stand behind AI-assisted output.")
+) |>
+  kable(escape = FALSE) |>
+  kable_styling(font_size = 24, full_width = FALSE) |>
+  column_spec(1, bold = TRUE)
+```
+
+# Delegation
+
+## D1 --- Delegation {style="font-size:90%;"}
+
+**Setting goals and deciding whether, when, and how to engage with AI.**
+
+- Understand your **goal** before touching the tool.
+- Know the **capability envelope**: what AI is good, weak, or forbidden at.
+- Make a *strategic choice* about the split between human and machine work --- **not** "do it all myself" or "do it all for me".
+
+::: {.fragment}
+**Default-to-automation is the failure mode:** asking AI to do the whole task because it's easiest. That's the concern behind every academic-integrity policy --- and the reason delegation is D1.
+:::
+
+# Description
+
+## D2 --- Description {style="font-size:90%;"}
+
+**Effectively describing goals to prompt useful AI behaviors and outputs.**
+
+Three sub-skills:
+
+- **Product description** --- what you want, in terms of *output, format, audience, style*.
+- **Process description** --- how you want the work done (steps, constraints, "don'ts").
+- **Behavior description** --- how you want the AI to *act* (persona, rules, escalation).
+
+. . .
+
+This is the **Prompting** session made formal: every lever from that talk (clear instructions, few-shot examples, system roles) is Description competence.
+
+# Discernment
+
+## D3 --- Discernment {style="font-size:90%;"}
+
+**Accurately assessing the usefulness of AI outputs and behaviors.**
+
+Remember part 1: a fluent answer is a *high-probability* answer --- **not** a *true* one.
+
+. . .
+
+Discernment in practice:
+
+- **Verify, don't just read** --- especially numbers, citations, and statistical claims.
+- **Artifact effect**: the more polished the output, the *less* people check it --- fluency is a sedative.
+- **Iteration**: refine, don't settle --- the single strongest correlate of good AI use in Anthropic's data.
+
+::: {.aside}
+This is where the **audit-literacy** session (session 2) plugs in: checking output is the practiced form of Discernment.
+:::
+
+# Diligence
+
+## D4 --- Diligence {style="font-size:90%;"}
+
+**Taking responsibility for what we do with AI and how we do it.**
+
+- **Accountability** --- you own the output. "The model did it" is not a defense.
+- **Transparency** --- disclose AI involvement where it matters (assignments, publications, student work).
+- **Ethics** --- data privacy, IP, fairness: *how* you do it with AI counts as much as *what* you do.
+
+. . .
+
+The other three Ds make AI **useful**; Diligence keeps it **legitimate**.
+
+# Three Modes of Interaction
+
+## Automation, Augmentation, Agency {style="font-size:88%;"}
+
+The framework's second axis: **how** you hand work over.
+
+```{r}
+#| echo: false
+
+tibble(
+  Mode = c("Automation", "Augmentation", "Agency"),
+  Definition = c(
+    "AI **executes** specific tasks based on human instruction.",
+    "Humans and AI **collaborate** as thinking partners.",
+    "Humans **configure** AI to independently perform tasks on their behalf.")
+) |>
+  kable(escape = FALSE) |>
+  kable_styling(font_size = 26, full_width = FALSE) |>
+  column_spec(1, bold = TRUE)
+```
+
+::: {.aside}
+Notice the gradient: more capability, **more autonomy** --- and, per the audit ladder, more checking required at every step up.
+:::
+
+# Where This Fits
+
+## 4D $\times$ the Rest of the Day {style="font-size:90%;"}
+
+The 4D framework organizes **how well** you work with AI. The 3D Autonomy Ladder from session 1 organizes **how much** you hand off.
+
+- **Delegation** $\leftrightarrow$ choosing your rung on the autonomy ladder
+- **Description** $\leftrightarrow$ the prompting session (how to condition the distribution)
+- **Discernment** $\leftrightarrow$ the audit-literacy session (checking, not trusting)
+- **Diligence** $\leftrightarrow$ the guardrails: policy, disclosure, your own standards
+
+. . .
+
+**Takeaway:** the tools and models will keep changing. Fluency is the part that doesn't --- and it is what you leave this day with.
